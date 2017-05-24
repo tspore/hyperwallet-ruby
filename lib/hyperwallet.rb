@@ -46,7 +46,7 @@ module Hyperwallet
     }
     begin
       response = execute_request(request_opts)
-      handle_api_error(response.code, response.body) unless [200, 201].include?(response.code.to_i)
+      handle_api_error(response.code, response.body) unless [200, 201, 400].include?(response.code.to_i)
     rescue RestClient::ExceptionWithResponse => e
       if rcode = e.http_code and rbody = e.http_body
         handle_api_error(rcode, rbody)
@@ -64,7 +64,7 @@ module Hyperwallet
 
   def self.handle_api_error(rcode, rbody)
     case rcode
-    when 400, 404
+    when 404
       raise InvalidRequestError.new("Your request is invalid: #{rbody.inspect}", rcode, rbody)
     when 401
       raise AuthenticationError.new("Your API user or password is invalid: #{rbody.inspect}", rcode, rbody)
